@@ -65,6 +65,7 @@ export function ContactList({ onAdd }: { onAdd: () => void }) {
   const [addedId, setAddedId] = useState<string | null>(null);
   const prevCount = useRef(contacts.length);
   const listRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const filtered = useMemo(
     () => filterContacts(contacts, searchQuery),
@@ -105,8 +106,43 @@ export function ContactList({ onAdd }: { onAdd: () => void }) {
     await toggleStar(contactId);
   }, [toggleStar]);
 
+  const scrollToLetter = (letter: string) => {
+    const el = sectionRefs.current.get(letter);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const allLetters = useMemo(
+    () => [...new Set(contacts.map(c => c.displayName.charAt(0).toUpperCase()))].sort(),
+    [contacts]
+  );
+
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <Box
+        sx={{
+          mx: 1.5, mt: 1.5, mb: 0.5, px: 0.5,
+          display: 'flex', alignItems: 'center',
+        }}
+      >
+        <Typography
+          sx={{
+            fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.02em',
+            background: 'linear-gradient(135deg, #8B5CF6, #EC4899)',
+            backgroundClip: 'text', WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          Nexus
+        </Typography>
+        <Typography
+          sx={{
+            fontWeight: 300, fontSize: '1.1rem', color: 'text.secondary',
+            ml: 0.75, letterSpacing: '-0.01em',
+          }}
+        >
+          Contacts
+        </Typography>
+      </Box>
       <Box
         sx={{
           mx: 1.5,
@@ -184,7 +220,11 @@ export function ContactList({ onAdd }: { onAdd: () => void }) {
         )}
 
         {!loading && sections.map(([letter, sectionContacts]) => (
-          <Box key={letter} sx={{ mb: 0.25 }}>
+          <Box
+            key={letter}
+            ref={(el: HTMLDivElement | null) => { if (el) sectionRefs.current.set(letter, el); }}
+            sx={{ mb: 0.25 }}
+          >
             <Typography
               variant="overline"
               sx={{
@@ -331,6 +371,31 @@ export function ContactList({ onAdd }: { onAdd: () => void }) {
           </Box>
         ))}
       </Box>
+
+      {!loading && allLetters.length > 1 && (
+        <Box
+          sx={{
+            position: 'absolute', right: 2, top: 100, bottom: 80,
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center', gap: 0, zIndex: 5, py: 1,
+          }}
+        >
+          {allLetters.map((l) => (
+            <Box
+              key={l}
+              onClick={() => scrollToLetter(l)}
+              sx={{
+                fontSize: '0.6rem', fontWeight: 700, color: 'text.secondary',
+                py: 0.3, px: 0.6, cursor: 'pointer', borderRadius: 1,
+                transition: 'all 0.15s', opacity: 0.3,
+                '&:hover': { opacity: 1, color: 'primary.light', transform: 'scale(1.2)' },
+              }}
+            >
+              {l}
+            </Box>
+          ))}
+        </Box>
+      )}
 
       <Box
         sx={{

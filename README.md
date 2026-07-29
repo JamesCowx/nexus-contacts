@@ -1,7 +1,11 @@
-# Polaris Contacts
+# Nexus Contacts
 
 A premium, cross-platform contacts management app with cloud sync. Built with Electron + React + TypeScript, featuring a stunning dark-mode-first UI with glassmorphism, 3D tilt effects, confetti celebrations, and more.
 
+<p align="center">
+  <strong><a href="https://jamescowx.github.io/nexus-contacts/">Live Demo</a></strong> &nbsp;·&nbsp;
+  <strong><a href="https://github.com/JamesCowx/nexus-contacts/releases/latest">Download .exe</a></strong>
+</p>
 <p align="center">
   <strong>Desktop</strong> (Windows · macOS · Linux) &nbsp;·&nbsp;
   <strong>Web</strong> &nbsp;·&nbsp;
@@ -70,7 +74,7 @@ A premium, cross-platform contacts management app with cloud sync. Built with El
 ## Architecture
 
 ```
-polaris-contacts/
+nexus-contacts/
 ├── packages/
 │   ├── core/          # Shared: components, store, types, DB, sync engine
 │   ├── web/           # Vite web app
@@ -81,7 +85,7 @@ polaris-contacts/
 └── pnpm-workspace.yaml
 ```
 
-All packages import from `@contacts/core` which contains the shared React UI
+All packages import from `@nexus/core` which contains the shared React UI
 (material-themed components, Zustand contact store, Dexie database layer, and
 sync engine). Each app wrapper is minimal — just a `main.tsx` mounting the `<App />`.
 
@@ -116,7 +120,7 @@ pnpm approve-builds better-sqlite3 esbuild electron
 
 ### Web
 ```bash
-pnpm --filter @contacts/web build
+pnpm --filter @nexus/web build
 # Output: packages/web/dist/
 ```
 
@@ -124,28 +128,28 @@ pnpm --filter @contacts/web build
 
 **Windows (.exe)**
 ```bash
-pnpm --filter @contacts/desktop build
+pnpm --filter @nexus/desktop build
 # Output: packages/desktop/release/Polaris Contacts Setup X.X.X.exe
 ```
 
 **macOS (.dmg)**
 ```bash
-pnpm --filter @contacts/desktop build
+pnpm --filter @nexus/desktop build
 # Output: packages/desktop/release/Polaris Contacts-X.X.X.dmg
 ```
 
 **Linux (.AppImage / .deb)**
 ```bash
-pnpm --filter @contacts/desktop build
+pnpm --filter @nexus/desktop build
 # Output: packages/desktop/release/Polaris Contacts-X.X.X.AppImage
 ```
 
 ### Mobile
 ```bash
-pnpm --filter @contacts/mobile build    # Build web assets
-pnpm --filter @contacts/mobile sync     # Sync with Capacitor
-pnpm --filter @contacts/mobile open:android  # Open in Android Studio
-pnpm --filter @contacts/mobile open:ios      # Open in Xcode
+pnpm --filter @nexus/mobile build    # Build web assets
+pnpm --filter @nexus/mobile sync     # Sync with Capacitor
+pnpm --filter @nexus/mobile open:android  # Open in Android Studio
+pnpm --filter @nexus/mobile open:ios      # Open in Xcode
 ```
 
 ---
