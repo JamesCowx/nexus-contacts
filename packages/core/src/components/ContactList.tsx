@@ -10,6 +10,7 @@ import {
   InputBase,
   Fade,
   Skeleton,
+  Chip,
 } from '@mui/material';
 import { Star, StarBorder, Search, Add, PersonOff } from '@mui/icons-material';
 import { keyframes } from '@emotion/react';
@@ -63,14 +64,21 @@ export function ContactList({ onAdd }: { onAdd: () => void }) {
   const [visibleLetters, setVisibleLetters] = useState<Set<string>>(new Set());
   const [starAnimIds, setStarAnimIds] = useState<Set<string>>(new Set());
   const [addedId, setAddedId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'all' | 'starred'>('all');
+  const [countBump, setCountBump] = useState(false);
   const prevCount = useRef(contacts.length);
   const listRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  const filtered = useMemo(
-    () => filterContacts(contacts, searchQuery),
-    [contacts, searchQuery],
+  const favorites = useMemo(
+    () => contacts.filter(c => c.starred && !c.deletedAt),
+    [contacts]
   );
+
+  const filtered = useMemo(() => {
+    const base = filter === 'starred' ? favorites : contacts;
+    return filterContacts(base, searchQuery);
+  }, [contacts, searchQuery, filter, favorites]);
 
   const grouped = useMemo(() => groupContacts(filtered), [filtered]);
   const sections = useMemo(
@@ -79,9 +87,13 @@ export function ContactList({ onAdd }: { onAdd: () => void }) {
   );
 
   useEffect(() => {
-    if (contacts.length > prevCount.current && prevCount.current > 0) {
-      const newId = contacts[0]?.id;
-      if (newId) setAddedId(newId);
+    if (contacts.length !== prevCount.current && prevCount.current > 0) {
+      setCountBump(true);
+      setTimeout(() => setCountBump(false), 400);
+      if (contacts.length > prevCount.current) {
+        const newId = contacts[0]?.id;
+        if (newId) setAddedId(newId);
+      }
     }
     prevCount.current = contacts.length;
   }, [contacts]);
@@ -171,12 +183,93 @@ export function ContactList({ onAdd }: { onAdd: () => void }) {
         />
       </Box>
 
-      <Typography
-        variant="caption"
-        sx={{ px: 2.5, py: 0.75, color: 'text.secondary', fontWeight: 500, fontSize: '0.7rem', letterSpacing: '0.05em' }}
-      >
-        {loading ? '' : `${filtered.length} contact${filtered.length !== 1 ? 's' : ''}`}
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 1.5, pt: 0.5 }}>
+        <Chip
+          label="All"
+          size="small"
+          variant={filter === 'all' ? 'filled' : 'outlined'}
+          onClick={() => setFilter('all')}
+          sx={{ fontWeight: 600, fontSize: '0.65rem', height: 24, borderRadius: 1.5 }}
+        />
+        {favorites.length > 0 && (
+          <Chip
+            label={`Starred ${favorites.length}`}
+            size="small"
+            icon={<Star sx={{ fontSize: 12, '&&': { color: '#FBBF24' } }} />}
+            variant={filter === 'starred' ? 'filled' : 'outlined'}
+            onClick={() => setFilter(filter === 'starred' ? 'all' : 'starred')}
+            sx={{ fontWeight: 600, fontSize: '0.65rem', height: 24, borderRadius: 1.5 }}
+          />
+        )}
+      </Box>
+
+      {!loading && filter === 'all' && favorites.length > 0 && searchQuery.length === 0 && (
+        <Fade in>
+          <Box sx={{ px: 1.5, pt: 0.5, pb: 0.5 }}>
+            <Box
+              sx={{
+                display: 'flex', gap: 1.5, overflowX: 'auto', pb: 0.5,
+                '&::-webkit-scrollbar': { display: 'none' },
+              }}
+            >
+              {favorites.slice(0, 12).map((c) => (
+                <Box
+                  key={c.id}
+                  onClick={() => selectContact(c.id)}
+                  sx={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    gap: 0.5, cursor: 'pointer', minWidth: 56, flexShrink: 0,
+                    transition: 'all 0.2s',
+                    '&:hover': { transform: 'translateY(-3px)' },
+                  }}
+                >
+                  <Box sx={{ position: 'relative' }}>
+                    <Box
+                      sx={{
+                        position: 'absolute', inset: -1.5, borderRadius: '50%',
+                        background: 'linear-gradient(135deg, rgba(251,191,36,0.3), rgba(251,191,36,0.1))',
+                        opacity: 0.5,
+                      }}
+                    />
+                    <Avatar
+                      src={c.photo}
+                      sx={{
+                        width: 42, height: 42, fontSize: 14, fontWeight: 700, color: '#fff',
+                        background: c.photo ? 'transparent' : getGradient(formatDisplayName(c)),
+                        border: '1.5px solid rgba(251,191,36,0.2)',
+                      }}
+                    >
+                      {!c.photo && getInitials(formatDisplayName(c))}
+                    </Avatar>
+                  </Box>
+                  <Typography
+                    sx={{
+                      fontSize: '0.6rem', fontWeight: 500, color: 'text.secondary',
+                      maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap', textAlign: 'center', opacity: 0.6,
+                    }}
+                  >
+                    {formatDisplayName(c)}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        </Fade>
+      )}
+
+      <Box sx={{ px: 2.5, py: 0.75, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary', fontWeight: 500, fontSize: '0.7rem',
+            letterSpacing: '0.05em', transform: countBump ? 'scale(1.15)' : 'scale(1)',
+            transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          }}
+        >
+          {loading ? '' : `${filtered.length} contact${filtered.length !== 1 ? 's' : ''}`}
+        </Typography>
+      </Box>
 
       <Box ref={listRef} sx={{ flex: 1, overflow: 'auto', px: 1, pb: 10 }}>
         {loading && (

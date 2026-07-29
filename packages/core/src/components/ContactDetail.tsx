@@ -299,25 +299,87 @@ function ActionChip({ icon, label }: { icon: React.ReactNode; label: string }) {
 
 function GlassSection({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <Box sx={{ borderRadius: 3.5, p: 2, mb: 1.5, backdropFilter: 'blur(16px)', backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)', transition: 'all 0.3s', '&:hover': { backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(139,92,246,0.08)' } }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-        {icon && <Box sx={{ fontSize: 16, color: 'primary.light', opacity: 0.5, display: 'flex' }}>{icon}</Box>}
-        <Typography variant="overline" sx={{ color: 'primary.light', fontWeight: 700, fontSize: '0.6rem', letterSpacing: '0.12em', opacity: 0.6 }}>{title}</Typography>
+    <Box sx={{
+      borderRadius: 3.5, p: 2.5, mb: 1.5, backdropFilter: 'blur(16px)',
+      backgroundColor: 'rgba(255,255,255,0.015)',
+      border: '1px solid rgba(255,255,255,0.03)',
+      transition: 'all 0.3s',
+      '&:hover': {
+        backgroundColor: 'rgba(255,255,255,0.025)',
+        borderColor: 'rgba(139,92,246,0.06)',
+      },
+    }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 2 }}>
+        {icon && (
+          <Box sx={{
+            width: 28, height: 28, borderRadius: 1.5, display: 'flex',
+            alignItems: 'center', justifyContent: 'center',
+            backgroundColor: 'rgba(139,92,246,0.08)', color: 'primary.light',
+            fontSize: 14, flexShrink: 0,
+          }}>
+            {icon}
+          </Box>
+        )}
+        <Typography variant="overline" sx={{ color: 'primary.light', fontWeight: 700, fontSize: '0.6rem', letterSpacing: '0.12em', opacity: 0.55 }}>
+          {title}
+        </Typography>
       </Box>
-      {children}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+        {children}
+      </Box>
     </Box>
   );
 }
 
-const rowSlide = keyframes`from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}`;
+const copyFlash = keyframes`
+  0% { background-color: rgba(139,92,246,0.15); }
+  100% { background-color: transparent; }
+`;
+
+const rowSlide = keyframes`
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+`;
 
 function InfoRow({ icon, label, value, delay = 0, avatarColor }: { icon?: React.ReactNode; label: string; value: string; delay?: number; avatarColor?: string }) {
+  const [flashed, setFlashed] = useState(false);
+
+  const handleClick = () => {
+    navigator.clipboard?.writeText(value);
+    setFlashed(true);
+    setTimeout(() => setFlashed(false), 500);
+  };
+
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 0.6, px: 1, mx: -1, cursor: 'pointer', borderRadius: 2, transition: 'all 0.2s', animation: `${rowSlide} 0.35s ${delay}s both`, '&:hover': { backgroundColor: avatarColor ? `${avatarColor}08` : 'rgba(139,92,246,0.06)', '& .info-icon': { color: avatarColor || '#A78BFA', opacity: 0.8 } } }}>
-      {icon ? <Box className="info-icon" sx={{ color: 'text.secondary', display: 'flex', fontSize: 17, opacity: 0.25, transition: 'all 0.2s', minWidth: 20, justifyContent: 'center' }}>{icon}</Box> : <Box sx={{ minWidth: 20 }} />}
-      <Box sx={{ minWidth: 0 }}>
-        <Typography sx={{ color: 'text.secondary', fontWeight: 500, fontSize: '0.6rem', letterSpacing: '0.05em', opacity: 0.4, mb: 0.15 }}>{label}</Typography>
-        <Typography sx={{ fontWeight: 500, fontSize: '0.85rem', wordBreak: 'break-word', color: 'text.primary', opacity: 0.85 }}>{value}</Typography>
+    <Box
+      onClick={handleClick}
+      sx={{
+        display: 'flex', alignItems: 'center', gap: 2,
+        py: 1.25, px: 1.5, mx: -1.5, cursor: 'pointer', borderRadius: 2.5,
+        transition: 'all 0.2s',
+        animation: `${rowSlide} 0.35s ${delay}s both`,
+        animationFillMode: 'both',
+        backgroundColor: flashed ? 'rgba(139,92,246,0.12)' : 'transparent',
+        '&:hover': {
+          backgroundColor: avatarColor ? `${avatarColor}08` : 'rgba(139,92,246,0.04)',
+          '& .info-icon': { color: avatarColor || '#A78BFA', opacity: 0.7 },
+        },
+      }}
+    >
+      {icon ? (
+        <Box className="info-icon" sx={{ color: 'text.secondary', display: 'flex', fontSize: 18, opacity: 0.2, transition: 'all 0.2s', minWidth: 22, justifyContent: 'center' }}>
+          {icon}
+        </Box>
+      ) : (
+        <Box sx={{ minWidth: 22 }} />
+      )}
+      <Box sx={{ minWidth: 0, flex: 1 }}>
+        <Typography sx={{ color: 'text.secondary', fontWeight: 500, fontSize: '0.6rem', letterSpacing: '0.05em', opacity: 0.35, mb: 0.2 }}>
+          {label}
+        </Typography>
+        <Typography sx={{ fontWeight: 500, fontSize: '0.88rem', wordBreak: 'break-word', color: 'text.primary', opacity: 0.9, lineHeight: 1.4 }}>
+          {value}
+        </Typography>
       </Box>
     </Box>
   );
