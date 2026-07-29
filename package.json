@@ -1,13 +1,13 @@
 {
-  "name": "polaris-contacts",
+  "name": "nexus-contacts",
   "private": true,
   "scripts": {
     "dev": "pnpm --parallel -r dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
-    "web": "pnpm --filter @contacts/web dev",
-    "desktop": "pnpm --filter @contacts/desktop dev",
-    "server": "pnpm --filter @contacts/server dev"
+    "web": "pnpm --filter @nexus/web dev",
+    "desktop": "pnpm --filter @nexus/desktop dev",
+    "server": "pnpm --filter @nexus/server dev"
   },
   "engines": {
     "node": ">=18"

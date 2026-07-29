@@ -1,5 +1,5 @@
 {
-  "name": "@contacts/mobile",
+  "name": "@nexus/mobile",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -16,7 +16,7 @@
     "@capacitor/core": "^6.1.0",
     "@capacitor/ios": "^6.1.0",
     "@capacitor/splash-screen": "^6.0.0",
-    "@contacts/core": "workspace:*",
+    "@nexus/core": "workspace:*",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.0",

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus Contacts — Premium Cross-Platform Contacts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #070312;
+      color: #F0EEFF;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    canvas#bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    .noise-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.012;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center; gap: 28px; padding: 60px 20px;
+      position: relative; z-index: 1;
+    }
+    .hero h1 {
+      font-size: clamp(2.6rem, 7vw, 5rem); font-weight: 800; line-height: 1.1;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #FBBF24 100%);
+      background-size: 200% 200%;
+      background-clip: text; -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 4s ease infinite;
+    }
+    @keyframes gradientShift {
+      0%,100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .hero p.subtitle {
+      font-size: clamp(1.05rem, 2vw, 1.3rem); color: rgba(180,175,210,0.7);
+      max-width: 580px; line-height: 1.7; font-weight: 400;
+    }
+
+    /* Buttons */
+    .btn-group { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px;
+      border-radius: 12px; font-weight: 600; font-size: 0.95rem; text-decoration: none;
+      transition: all 0.25s; cursor: pointer; border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #7C3AED, #8B5CF6);
+      color: #fff; box-shadow: 0 4px 20px rgba(139,92,246,0.4);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(139,92,246,0.5);
+    }
+    .btn-outline {
+      background: rgba(255,255,255,0.04); color: #A78BFA;
+      border: 1px solid rgba(139,92,246,0.2);
+      backdrop-filter: blur(12px);
+    }
+    .btn-outline:hover {
+      background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.4);
+    }
+    .platform-badge { display: flex; gap: 12px; margin-top: 8px; }
+    .platform-badge span {
+      font-size: 0.7rem; font-weight: 500; color: rgba(180,175,210,0.4);
+      padding: 4px 12px; border-radius: 20px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    /* Features */
+    .features { padding: 80px 0; }
+    .features h2 {
+      text-align: center; font-size: 2rem; font-weight: 700; margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .features .sub {
+      text-align: center; color: rgba(180,175,210,0.5); margin-bottom: 48px;
+      font-size: 1rem;
+    }
+    .feature-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+    }
+    .feature-card {
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 16px; padding: 28px; backdrop-filter: blur(16px);
+      transition: all 0.3s;
+    }
+    .feature-card:hover {
+      background: rgba(255,255,255,0.03); border-color: rgba(139,92,246,0.1);
+      transform: translateY(-2px);
+    }
+    .feature-card .icon {
+      font-size: 28px; margin-bottom: 14px; width: 50px; height: 50px;
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      background: rgba(139,92,246,0.1); color: #A78BFA;
+    }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; }
+    .feature-card p { font-size: 0.85rem; color: rgba(180,175,210,0.55); line-height: 1.65; }
+
+    /* Download section */
+    .download { padding: 80px 0 100px; text-align: center; }
+    .download h2 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+    .download .sub { color: rgba(180,175,210,0.5); margin-bottom: 32px; }
+    .download-card {
+      display: inline-flex; flex-direction: column; align-items: center; gap: 18px;
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(139,92,246,0.1);
+      border-radius: 20px; padding: 36px 48px; backdrop-filter: blur(16px);
+    }
+    .download-card .version { font-size: 0.75rem; color: rgba(180,175,210,0.4); }
+    .os-links { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+    .os-links a {
+      font-size: 0.72rem; color: rgba(180,175,210,0.4); text-decoration: none;
+      padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.04); transition: all 0.2s;
+    }
+    .os-links a:hover { color: #A78BFA; border-color: rgba(139,92,246,0.3); }
+
+    /* Footer */
+    footer {
+      text-align: center; padding: 32px; border-top: 1px solid rgba(255,255,255,0.03);
+      color: rgba(180,175,210,0.25); font-size: 0.78rem;
+    }
+    footer a { color: rgba(180,175,210,0.4); text-decoration: none; }
+    footer a:hover { color: #A78BFA; }
+
+    @media (max-width: 600px) {
+      .download-card { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="noise-overlay"></div>
+
+  <section class="hero">
+    <h1>Nexus Contacts</h1>
+    <p class="subtitle">
+      A premium, cross-platform contacts manager with a stunning dark interface.
+      Manage your connections beautifully across desktop, web, and mobile — with
+      local storage and optional cloud sync.
+    </p>
+    <div class="btn-group">
+      <a href="#download" class="btn btn-primary">&#8595; Download for Windows</a>
+      <a href="https://github.com/JamesCowx/nexus-contacts" class="btn btn-outline" target="_blank">View on GitHub</a>
+    </div>
+    <div class="platform-badge">
+      <span>Windows</span> <span>macOS</span> <span>Linux</span>
+      <span>Web</span> <span>Android</span> <span>iOS</span>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="container">
+      <h2>Everything you need</h2>
+      <p class="sub">A contacts app built for the modern world</p>
+      <div class="feature-grid">
+
+        <div class="feature-card">
+          <div class="icon">&#10024;</div>
+          <h3>Stunning Dark UI</h3>
+          <p>
+            Glassmorphism cards, animated gradient backgrounds, mouse-tracking
+            spotlight, floating particles, 3D perspective tilts — every detail crafted.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">&#128241;</div>
+          <h3>Rich Contacts</h3>
+          <p>
+            Multiple phone numbers, emails, addresses, social profiles, company info,
+            birthday, notes, groups, and starred favorites.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">&#127758;</div>
+          <h3>Truly Cross-Platform</h3>
+          <p>
+            Windows .exe, macOS .dmg, Linux .AppImage, deploy anywhere as a web app,
+            or package for Android/iOS with Capacitor.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">&#9729;</div>
+          <h3>Cloud Sync (Optional)</h3>
+          <p>
+            Built-in sync engine with Express + SQLite server. Timestamp-based
+            conflict resolution keeps contacts in sync across your devices.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">&#9889;</div>
+          <h3>Local-First &amp; Fast</h3>
+          <p>
+            IndexedDB via Dexie.js stores everything locally. Works fully offline.
+            No account required. Your data stays on your device.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">&#127912;</div>
+          <h3>Delightful Micro-Interactions</h3>
+          <p>
+            Confetti burst on new contacts, star bounce animation, magnetic FAB,
+            scroll parallax, staggered entrances, and smooth toast notifications.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="download" id="download">
+    <div class="container">
+      <h2>Download</h2>
+      <p class="sub">Grab the latest version for your platform</p>
+      <div class="download-card">
+        <span class="version">Version 1.0.0</span>
+        <a href="https://github.com/JamesCowx/nexus-contacts/releases/download/v1.0.0/Nexus.Contacts.Setup.1.0.0.exe" class="btn btn-primary">
+          &#8595; Download for Windows (.exe)
+        </a>
+        <span class="version">82 MB &middot; Windows 10/11 &middot; 64-bit</span>
+        <div class="os-links">
+          <a href="https://github.com/JamesCowx/nexus-contacts/releases">macOS .dmg (coming soon)</a>
+          <a href="https://github.com/JamesCowx/nexus-contacts/releases">Linux .AppImage (coming soon)</a>
+        </div>
+        <p style="font-size:0.78rem;color:rgba(180,175,210,0.3);margin-top:8px;">
+          Prefer the web? Try it at <a href="https://jamescowx.github.io/nexus-contacts/" style="color:#A78BFA">the web demo</a> or run <code>pnpm web</code> locally.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      <a href="https://github.com/JamesCowx/nexus-contacts" target="_blank">Nexus Contacts</a>
+      &middot; Built with Electron + React + TypeScript &middot; MIT License
+    </p>
+  </footer>
+
+  <script>
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+    let w, h, anim;
+    const dots = Array.from({length: 40}, () => ({
+      x: 0, y: 0, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3,
+      size: Math.random()*2.5+0.5, opacity: Math.random()*0.04+0.01
+    }));
+
+    function resize() {
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = w; canvas.height = h;
+      dots.forEach(d => { d.x = Math.random()*w; d.y = Math.random()*h; });
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    (function loop() {
+      ctx.clearRect(0,0,w,h);
+      for (const d of dots) {
+        d.x += d.vx; d.y += d.vy;
+        if (d.x<0) d.x=w; if (d.x>w) d.x=0; if (d.y<0) d.y=h; if (d.y>h) d.y=0;
+        ctx.beginPath(); ctx.arc(d.x,d.y,d.size,0,Math.PI*2);
+        ctx.fillStyle = `rgba(139,92,246,${d.opacity})`; ctx.fill();
+      }
+      anim = requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>

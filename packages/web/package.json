@@ -1,5 +1,5 @@
 {
-  "name": "@contacts/web",
+  "name": "@nexus/web",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -10,7 +10,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@contacts/core": "workspace:*",
+    "@nexus/core": "workspace:*",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.0",

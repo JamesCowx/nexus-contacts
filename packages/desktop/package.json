@@ -1,5 +1,5 @@
 {
-  "name": "@contacts/desktop",
+  "name": "@nexus/desktop",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -10,7 +10,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@contacts/core": "workspace:*",
+    "@nexus/core": "workspace:*",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.0",
@@ -31,8 +31,8 @@
     "wait-on": "^7.2.0"
   },
   "build": {
-    "appId": "com.polaris.contacts",
-    "productName": "Polaris Contacts",
+    "appId": "com.nexus.contacts",
+    "productName": "Nexus Contacts",
     "directories": { "output": "release" },
     "win": { "target": "nsis" },
     "mac": { "target": "dmg", "category": "public.app-category.productivity" },
